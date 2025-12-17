@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marcel Barti - Técnico en SMR</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+  <style>
+    .login-page {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-page.show {
+      display: flex;
+    }
+
+    .login-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-header h1 {
+      font-size: 1.875rem;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-header p {
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #10b981;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .login-btn:hover {
+      background-color: #059669;
+    }
+
+    .error-msg {
+      color: #dc2626;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      display: none;
+      background-color: #fee2e2;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+    }
+
+    .error-msg.show {
+      display: block;
+    }
+
+    .logo {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .logout-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 0.5rem 1rem;
+      background-color: #dc2626;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      font-size: 0.875rem;
+      z-index: 1000;
+    }
+
+    .logout-btn:hover {
+      background-color: #991b1b;
+    }
+  </style>
+</head>
+<body>
+  <!-- LOGIN PAGE -->
+  <div class="login-page show" id="loginPage">
+    <div class="login-container">
+      <div class="login-header">
+        <div class="logo">🔐</div>
+        <h1>Marcel Barti</h1>
+        <p>Currículum Profesional</p>
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input 
+            type="password" 
+            id="password" 
+            placeholder="Ingresa la contraseña"
+            required
+            autofocus
+          >
+          <div class="error-msg" id="errorMsg">
+            ❌ Contraseña incorrecta
+          </div>
+        </div>
+        <button type="submit" class="login-btn">Acceder</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- LOGOUT BUTTON -->
+  <button class="logout-btn" id="logoutBtn" style="display: none;">Cerrar Sesión</button>
+
+  <!-- MAIN CONTENT -->
+  <div id="mainContent" style="display: none;">
+    <!-- Navbar -->
+    <nav>
+      <div class="container">
+        <div class="navbar">
+          <a href="index.html" class="navbar-brand">MB</a>
+          
+          <ul class="navbar-links">
+            <li><a href="#inicio">Inicio</a></li>
+            <li><a href="#sobre-mi">Sobre Mí</a></li>
+            <li><a href="#experiencia">Experiencia</a></li>
+            <li><a href="#proyectos">Proyectos</a></li>
+            <li><a href="#blog">Blog</a></li>
+            <li><a href="#contacto">Contacto</a></li>
+          </ul>
+
+          <div class="navbar-cta">
+            <button class="btn btn-primary btn-small" data-download-cv>
+              📥 CV
+            </button>
+          </div>
+
+          <button class="menu-toggle">☰</button>
+        </div>
+      </div>
+
+      <!-- Menú móvil -->
+      <ul class="mobile-menu">
+        <li><a href="#inicio">Inicio</a></li>
+        <li><a href="#sobre-mi">Sobre Mí</a></li>
+        <li><a href="#experiencia">Experiencia</a></li>
+        <li><a href="#proyectos">Proyectos</a></li>
+        <li><a href="#blog">Blog</a></li>
+        <li><a href="#contacto">Contacto</a></li>
+        <li style="padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+          <button class="btn btn-primary btn-small w-100" data-download-cv style="width: 100%;">
+            📥 Descargar CV
+          </button>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+      <!-- Hero Section -->
+      <section class="hero fade-in" id="inicio">
+        <div class="container">
+          <div class="max-w-3xl">
+            <div class="mb-4">
+              <span class="badge">Estudiante de SMR</span>
+            </div>
+            
+            <h1 class="mb-4">Marcel Barti</h1>
+            
+            <p class="text-lg mb-4">
+              Técnico en Sistemas Microinformáticos y Redes. Apasionado por la tecnología, hardware y redes.
+            </p>
+
+            <p class="text-lg text-muted mb-4">
+              Comprometido con la excelencia profesional y el crecimiento continuo en el sector IT. 
+              Experiencia práctica en soporte técnico, hardware y redes en entornos reales.
+            </p>
+
+            <div class="flex flex-center gap-2 flex-wrap justify-center">
+              <a href="#contacto" class="btn btn-primary">
+                Contactar →
+              </a>
+              <button class="btn btn-outline" data-download-cv>
+                📥 Descargar CV
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Highlights -->
+      <section id="sobre-mi">
+        <div class="container">
+          <div class="grid grid-3">
+            <div class="card fade-in">
+              <div class="flex flex-center mb-3">
+                <div style="padding: 0.75rem; background-color: rgba(16, 185, 129, 0.1); border-radius: 0.5rem;">
+                  💻
+                </div>
+              </div>
+              <h3 class="text-center mb-2">Técnico en SMR</h3>
+              <p class="text-center text-sm">Sistemas Microinformáticos y Redes</p>
+            </div>
+
+            <div class="card fade-in">
+              <div class="flex flex-center mb-3">
+                <div style="padding: 0.75rem; background-color: rgba(16, 185, 129, 0.1); border-radius: 0.5rem;">
+                  ⚡
+                </div>
+              </div>
+              <h3 class="text-center mb-2">545+ Horas</h3>
+              <p class="text-center text-sm">Experiencia práctica acumulada</p>
+            </div>
+
+            <div class="card fade-in">
+              <div class="flex flex-center mb-3">
+                <div style="padding: 0.75rem; background-color: rgba(16, 185, 129, 0.1); border-radius: 0.5rem;">
+                  🌍
+                </div>
+              </div>
+              <h3 class="text-center mb-2">Experiencia Internacional</h3>
+              <p class="text-center text-sm">Erasmus+ en Eslovenia</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Experience Preview -->
+      <section class="secondary" id="experiencia">
+        <div class="container">
+          <div class="max-w-4xl">
+            <div class="text-center mb-4">
+              <h2>Experiencia Profesional</h2>
+              <p class="text-muted">Formación práctica en entornos reales</p>
+            </div>
+
+            <div class="grid grid-2 mb-4">
+              <div class="card fade-in">
+                <h3 class="card-title">Prácticas FCT</h3>
+                <p class="card-subtitle">Hospital</p>
+                <p class="card-text">Soporte técnico en entorno hospitalario crítico</p>
+                <span class="badge">515 horas</span>
+              </div>
+
+              <div class="card fade-in">
+                <h3 class="card-title">Erasmus+</h3>
+                <p class="card-subtitle">Pronid.si</p>
+                <p class="card-text">Experiencia internacional en servicios IT</p>
+                <span class="badge">30 días</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Skills Preview -->
+      <section id="proyectos">
+        <div class="container">
+          <div class="max-w-4xl">
+            <div class="text-center mb-4">
+              <h2>Áreas de Especialización</h2>
+              <p class="text-muted">Habilidades técnicas desarrolladas</p>
+            </div>
+
+            <div class="grid grid-3">
+              <div class="card fade-in">
+                <h3 class="mb-3">Hardware</h3>
+                <ul style="list-style: none;">
+                  <li class="flex mb-2">
+                    <span style="width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; margin-right: 0.5rem; margin-top: 0.5rem;"></span>
+                    <span class="text-sm text-muted">Reparación</span>
+                  </li>
+                  <li class="flex mb-2">
+                    <span style="width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; margin-right: 0.5rem; margin-top: 0.5rem;"></span>
+                    <span class="text-sm text-muted">Diagnóstico</span>
+                  </li>
+                  <li class="flex">
+                    <span style="width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; margin-right: 0.5rem; margin-top: 0.5rem;"></span>
+                    <span class="text-sm text-muted">Mantenimiento</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="card fade-in">
+                <h3 class="mb-3">Redes</h3>
+                <ul style="list-style: none;">
+                  <li class="flex mb-2">
+                    <span style="width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; margin-right: 0.5rem; margin-top: 0.5rem;"></span>
+                    <span class="text-sm text-muted">Configuración</span>
+                  </li>
+                  <li class="flex mb-2">
+                    <span style="width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; margin-right: 0.5rem; margin-top: 0.5rem;"></span>
+                    <span class="text-sm text-muted">Cisco Packet Tracer</span>
+                  </li>
+                  <li class="flex">
+                    <span style="width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; margin-right: 0.5rem; margin-top: 0.5rem;"></span>
+                    <span class="text-sm text-muted">TCP/IP</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="card fade-in">
+                <h3 class="mb-3">Sistemas</h3>
+                <ul style="list-style: none;">
+                  <li class="flex mb-2">
+                    <span style="width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; margin-right: 0.5rem; margin-top: 0.5rem;"></span>
+                    <span class="text-sm text-muted">Windows</span>
+                  </li>
+                  <li class="flex mb-2">
+                    <span style="width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; margin-right: 0.5rem; margin-top: 0.5rem;"></span>
+                    <span class="text-sm text-muted">Linux</span>
+                  </li>
+                  <li class="flex">
+                    <span style="width: 6px; height: 6px; background-color: #10b981; border-radius: 50%; margin-right: 0.5rem; margin-top: 0.5rem;"></span>
+                    <span class="text-sm text-muted">Administración</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Blog Section -->
+      <section class="secondary" id="blog">
+        <div class="container">
+          <div class="max-w-4xl">
+            <div class="text-center mb-4">
+              <h2>Blog Técnico</h2>
+              <p class="text-muted">Artículos y tutoriales</p>
+            </div>
+
+            <div class="grid grid-2">
+              <div class="card fade-in">
+                <h3 class="card-title">Introducción a Redes</h3>
+                <p class="card-text">Conceptos fundamentales de redes LAN y TCP/IP</p>
+              </div>
+
+              <div class="card fade-in">
+                <h3 class="card-title">Soporte Técnico</h3>
+                <p class="card-text">Mejores prácticas en atención al usuario</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Contact Section -->
+      <section id="contacto">
+        <div class="container">
+          <div class="max-w-4xl">
+            <div class="text-center mb-4">
+              <h2>Contacto</h2>
+              <p class="text-muted">Ponte en contacto conmigo</p>
+            </div>
+
+            <div class="grid grid-2">
+              <div class="card">
+                <h3>Formulario de Contacto</h3>
+                <form id="contactForm">
+                  <div class="form-group">
+                    <label for="name">Nombre</label>
+                    <input type="text" id="name" name="name" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="subject">Asunto</label>
+                    <input type="text" id="subject" name="subject" required>
+                  </div>
+                  <div class="form-group">
+                    <label for="message">Mensaje</label>
+                    <textarea id="message" name="message" required style="min-height: 120px;"></textarea>
+                  </div>
+                  <button type="submit" class="btn btn-primary">Enviar</button>
+                </form>
+                <div id="formMessage" style="margin-top: 1rem; display: none; padding: 1rem; border-radius: 0.5rem;"></div>
+              </div>
+
+              <div class="card">
+                <h3>Información de Contacto</h3>
+                <p><strong>📧 Email:</strong> marcelbartiii@gmail.com</p>
+                <p><strong>📱 Teléfono:</strong> +34 617 674 365</p>
+                <p><strong>📍 Ubicación:</strong> Girona, España</p>
+                <p><strong>🔗 Portfolio:</strong> <a href="https://drive.google.com/drive/folders/1HHtzF9ZA79TtUvDZIrfMhtDBOdrsGS7b?usp=sharing" target="_blank">Google Drive</a></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
+      <section style="background-color: #10b981; color: white;">
+        <div class="container">
+          <div class="max-w-2xl text-center">
+            <h2 style="color: white;">¿Listo para colaborar?</h2>
+            <p class="text-lg mb-4" style="color: rgba(255, 255, 255, 0.9);">
+              Estoy disponible para oportunidades profesionales y proyectos interesantes.
+            </p>
+            <a href="#contacto" class="btn" style="background-color: white; color: #10b981;">
+              Contactarme →
+            </a>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <div class="container">
+        <div class="footer-content">
+          <div>
+            <h3 class="font-bold mb-2">Marcel Barti</h3>
+            <p class="text-sm text-muted">
+              Técnico en SMR. Apasionado por la tecnología.
+            </p>
+          </div>
+
+          <div class="footer-section">
+            <h4>Navegación</h4>
+            <ul>
+              <li><a href="#inicio">Inicio</a></li>
+              <li><a href="#sobre-mi">Sobre Mí</a></li>
+              <li><a href="#experiencia">Experiencia</a></li>
+              <li><a href="#proyectos">Proyectos</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>Contacto</h4>
+            <ul>
+              <li><a href="mailto:marcelbartiii@gmail.com">📧 Email</a></li>
+              <li><a href="tel:+34617674365">📱 Teléfono</a></li>
+              <li>📍 Girona, España</li>
+            </ul>
+          </div>
+
+          <div class="footer-section">
+            <h4>Redes</h4>
+            <ul>
+              <li><a href="https://linkedin.com" target="_blank">LinkedIn</a></li>
+              <li><a href="https://github.com" target="_blank">GitHub</a></li>
+              <li><a href="https://drive.google.com/drive/folders/1HHtzF9ZA79TtUvDZIrfMhtDBOdrsGS7b?usp=sharing" target="_blank">Portfolio</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-bottom">
+          <p>&copy; 2024 Marcel Barti Pujol. Todos los derechos reservados.</p>
+          <p>Diseñado y desarrollado profesionalmente</p>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // ============================================
+    // SISTEMA DE AUTENTICACIÓN SIMPLE
+    // Contraseña: marcus0parcus2
+    // ============================================
+
+    const CORRECT_PASSWORD = 'marcus0parcus2';
+
+    // Verificar si ya está autenticado
+    function checkAuth() {
+      if (localStorage.getItem('authenticated') === 'true') {
+        showMainContent();
+      } else {
+        showLogin();
+      }
+    }
+
+    function showLogin() {
+      document.getElementById('loginPage').classList.add('show');
+      document.getElementById('mainContent').style.display = 'none';
+      document.getElementById('logoutBtn').style.display = 'none';
+    }
+
+    function showMainContent() {
+      document.getElementById('loginPage').classList.remove('show');
+      document.getElementById('mainContent').style.display = 'block';
+      document.getElementById('logoutBtn').style.display = 'block';
+    }
+
+    // Manejar login
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const password = document.getElementById('password').value;
+      const errorMsg = document.getElementById('errorMsg');
+
+      if (password === CORRECT_PASSWORD) {
+        localStorage.setItem('authenticated', 'true');
+        document.getElementById('password').value = '';
+        errorMsg.classList.remove('show');
+        showMainContent();
+      } else {
+        errorMsg.classList.add('show');
+        document.getElementById('password').value = '';
+        document.getElementById('password').focus();
+      }
+    });
+
+    // Manejar logout
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+      localStorage.removeItem('authenticated');
+      showLogin();
+      document.getElementById('password').focus();
+    });
+
+    // Manejar descarga de CV
+    document.querySelectorAll('[data-download-cv]').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const link = document.createElement('a');
+        link.href = 'CV_Marcel_Barti.pdf';
+        link.download = 'CV_Marcel_Barti.pdf';
+        link.click();
+      });
+    });
+
+    // Manejar formulario de contacto
+    document.getElementById('contactForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const subject = document.getElementById('subject').value;
+      const message = document.getElementById('message').value;
+      const formMessage = document.getElementById('formMessage');
+
+      // Crear mailto link
+      const mailtoLink = `mailto:marcelbartiii@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(`Nombre: ${name}\nEmail: ${email}\n\nMensaje:\n${message}`)}`;
+      
+      // Abrir cliente de correo
+      window.location.href = mailtoLink;
+
+      // Mostrar mensaje de confirmación
+      formMessage.style.display = 'block';
+      formMessage.style.backgroundColor = '#dcfce7';
+      formMessage.style.color = '#166534';
+      formMessage.style.borderLeft = '4px solid #10b981';
+      formMessage.innerHTML = '✅ Se abrirá tu cliente de correo. Si no se abre automáticamente, copia el mensaje y envíalo a: marcelbartiii@gmail.com';
+
+      // Limpiar formulario
+      this.reset();
+
+      // Ocultar mensaje después de 5 segundos
+      setTimeout(() => {
+        formMessage.style.display = 'none';
+      }, 5000);
+    });
+
+    // Verificar autenticación al cargar
+    checkAuth();
+  </script>
+</body>
+</html>
