@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Acceso - Marcel Barti CV</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .login-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .login-header h1 {
+      font-size: 1.875rem;
+      color: #1f2937;
+      margin-bottom: 0.5rem;
+    }
+
+    .login-header p {
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #1f2937;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      font-family: inherit;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #10b981;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #059669;
+    }
+
+    button:disabled {
+      background-color: #d1d5db;
+      cursor: not-allowed;
+    }
+
+    .error-message {
+      color: #dc2626;
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .footer-text {
+      text-align: center;
+      margin-top: 1.5rem;
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+
+    .logo {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <div class="logo">🔐</div>
+      <h1>Marcel Barti</h1>
+      <p>Currículum Profesional</p>
+    </div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          placeholder="Ingresa la contraseña"
+          required
+          autofocus
+        >
+        <div class="error-message" id="errorMessage">
+          ❌ Contraseña incorrecta. Intenta de nuevo.
+        </div>
+      </div>
+
+      <button type="submit">Acceder</button>
+    </form>
+
+    <div class="footer-text">
+      Sitio protegido con contraseña
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script>
+  
+    const CORRECT_HASH = "f3e5c8a5b9d2e1f4a7c6b5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5";
+
+    // Verificar si ya está autenticado
+    if (sessionStorage.getItem('authenticated') === 'true') {
+      window.location.href = 'index.html';
+    }
+
+    // Manejar el formulario de login
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const passwordInput = document.getElementById('password');
+      const errorMessage = document.getElementById('errorMessage');
+      const passwordValue = passwordInput.value;
+      
+      // Calcular hash SHA256 de la contraseña ingresada
+      const inputHash = CryptoJS.SHA256(passwordValue).toString();
+      
+      // Comparar hashes (sin mostrar nunca la contraseña en texto plano)
+      if (inputHash === CORRECT_HASH) {
+        // Contraseña correcta
+        sessionStorage.setItem('authenticated', 'true');
+        errorMessage.classList.remove('show');
+        
+        // Limpiar el campo de contraseña de memoria
+        passwordInput.value = '';
+        
+        // Redirigir a la página principal
+        window.location.href = 'index.html';
+      } else {
+        // Contraseña incorrecta
+        errorMessage.classList.add('show');
+        passwordInput.value = '';
+        passwordInput.focus();
+      }
+    });
+
+    // Permitir Enter para enviar
+    document.getElementById('password').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+      }
+    });
+  </script>
+</body>
+</html>
